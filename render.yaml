@@ -1,10 +1,8 @@
 services:
   - type: web
     name: telegram-dl-bot
-    runtime: python
-    pythonVersion: 3.11.9
-    buildCommand: ""
-    startCommand: bash start.sh
+    env: docker
+    plan: free
     envVars:
       - key: TELEGRAM_TOKEN
         value: 8450049927:AAHx5T9jl-f7F2rbeET4cLGqzix3SI0QT6E
