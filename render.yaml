@@ -1,7 +1,10 @@
 services:
   - type: web
-    name: telegram-dl-bot
-    env: python
-    plan: free
+    name: telegram-video-bot
+    runtime: python
     buildCommand: ""
     startCommand: bash start.sh
+    envVars:
+      - key: TELEGRAM_TOKEN
+        value: YOUR_BOT_TOKEN
+    pythonVersion: 3.11.9
