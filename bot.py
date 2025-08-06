@@ -1,38 +1,31 @@
-from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters
-import logging
 import os
+import nest_asyncio
 import asyncio
+import logging
+from telegram import Update
+from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
 
 BOT_TOKEN = os.getenv("TELEGRAM_TOKEN")
 
-# Define your handlers here
-async def start(update, context):
-    await update.message.reply_text("👋 Hello! Send me a Dailymotion link to download.")
+logging.basicConfig(
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
+)
 
-async def handle_message(update, context):
-    await update.message.reply_text("⏳ Processing your link... (functionality here)")
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("👋 Hello! Send me a Dailymotion link to start downloading.")
+
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    text = update.message.text
+    await update.message.reply_text(f"🔗 Got your link: {text}\n(Processing logic goes here)")
 
 async def main():
-    application = (
-        ApplicationBuilder()
-        .token(BOT_TOKEN)
-        .build()
-    )
-
-    application.add_handler(CommandHandler("start", start))
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
-
+    app = ApplicationBuilder().token(BOT_TOKEN).build()
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    
     print("🤖 Bot is running...")
+    await app.run_polling()
 
-    # DON'T use asyncio.run — just await directly if __name__ == "__main__"
-    await application.run_polling()
-
-# Correct pattern for Render (already has event loop running)
 if __name__ == "__main__":
-    try:
-        asyncio.get_event_loop().run_until_complete(main())
-    except RuntimeError as e:
-        # fallback if loop already running
-        loop = asyncio.get_event_loop()
-        task = loop.create_task(main())
-        loop.run_until_complete(task)
+    nest_asyncio.apply()  # 🧠 Patch to allow nested asyncio loop
+    asyncio.get_event_loop().run_until_complete(main())
